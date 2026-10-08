@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cauce — Gestión para freelancers</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f3ef; --bg-2:#eae8e1; --ink:#15171c; --ink-soft:#5c5f68;
+    --indigo:#3730a3; --lime:#c6f135; --line:rgba(21,23,28,0.14); --card:#ffffff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#121316; --bg-2:#1a1c21; --ink:#f2f2f0; --ink-soft:#a8abb3;
+      --indigo:#8b85e8; --lime:#d4f95e; --line:rgba(242,242,240,0.14); --card:#1a1c21;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121316; --bg-2:#1a1c21; --ink:#f2f2f0; --ink-soft:#a8abb3;
+    --indigo:#8b85e8; --lime:#d4f95e; --line:rgba(242,242,240,0.14); --card:#1a1c21;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{ background:var(--bg); color:var(--ink); font-family:'Manrope',sans-serif; overflow-x:hidden; }
+  h1,h2,h3{ font-weight:700; letter-spacing:-0.02em; }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+  .wrap{ max-width:1120px; margin:0 auto; padding:0 28px; }
+  a{ color:inherit; }
+
+  nav{ position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  nav .wrap{ height:72px; display:flex; align-items:center; justify-content:space-between; }
+  .brand{ font-weight:800; font-size:1.25rem; }
+  .brand em{ font-style:normal; color:var(--indigo); }
+  .nav-links{ display:flex; gap:28px; font-size:0.92rem; color:var(--ink-soft); }
+  .nav-links a{ text-decoration:none; }
+  .nav-links a:hover{ color:var(--ink); }
+  .nav-cta{ background:var(--indigo); color:#fff; padding:10px 18px; border-radius:8px; text-decoration:none; font-size:0.88rem; font-weight:600; }
+
+  .hero{ padding:90px 0 40px; }
+  .hero .wrap{ display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
+  .kicker{ display:inline-block; background:var(--bg-2); border:1px solid var(--line); padding:6px 14px; border-radius:20px; font-size:0.85rem; margin-bottom:22px; }
+  .hero h1{ font-size:clamp(2.3rem,4.2vw,3.3rem); line-height:1.1; }
+  .hero p.lead{ margin-top:20px; color:var(--ink-soft); font-size:1.08rem; max-width:44ch; }
+  .hero-actions{ margin-top:30px; display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+  .btn-primary{ background:var(--ink); color:var(--bg); padding:15px 26px; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.96rem; display:inline-block; transition:transform .2s; }
+  .btn-primary:hover{ transform:translateY(-2px); }
+  .btn-ghost{ color:var(--ink-soft); text-decoration:underline; text-underline-offset:4px; font-size:0.96rem; }
+  .hero-note{ margin-top:16px; font-size:0.85rem; color:var(--ink-soft); }
+
+  /* Dashboard mock */
+  .dash{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; box-shadow: 0 20px 60px -30px rgba(0,0,0,0.35); }
+  .dash-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+  .dash-top .l{ font-size:0.85rem; color:var(--ink-soft); }
+  .dash-top .dots{ display:flex; gap:6px; }
+  .dash-top .dots span{ width:8px; height:8px; border-radius:50%; background:var(--line); }
+  .dash-stat{ display:flex; justify-content:space-between; align-items:baseline; padding:16px 0; border-bottom:1px solid var(--line); }
+  .dash-stat:last-of-type{ border-bottom:none; }
+  .dash-stat .label{ font-size:0.9rem; color:var(--ink-soft); }
+  .dash-stat .val{ font-family:'IBM Plex Mono',monospace; font-size:1.3rem; }
+  .dash-stat .val.up{ color:#2e8b57; }
+  @media (prefers-color-scheme: dark){ .dash-stat .val.up{ color:#7fe0a4; } }
+  :root[data-theme="dark"] .dash-stat .val.up{ color:#7fe0a4; }
+  .dash-bar-wrap{ margin-top:18px; }
+  .dash-bar-track{ height:8px; background:var(--bg-2); border-radius:6px; overflow:hidden; }
+  .dash-bar-fill{ height:100%; background:var(--lime); width:0%; border-radius:6px; transition:width 1.4s cubic-bezier(.2,.8,.2,1); }
+  .dash-bar-label{ display:flex; justify-content:space-between; font-size:0.8rem; color:var(--ink-soft); margin-top:8px; }
+
+  .section{ padding:96px 0; border-top:1px solid var(--line); }
+  .section-head{ max-width:54ch; margin-bottom:52px; }
+  .section-head h2{ font-size:clamp(1.8rem,3vw,2.4rem); }
+  .section-head p{ margin-top:14px; color:var(--ink-soft); font-size:1.02rem; }
+
+  .feature-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .feature{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:28px; }
+  .feature .icon{ width:38px; height:38px; border-radius:8px; background:var(--indigo); margin-bottom:18px; }
+  .feature h3{ font-size:1.08rem; margin-bottom:10px; }
+  .feature p{ color:var(--ink-soft); font-size:0.94rem; }
+
+  /* Comparison */
+  table{ width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  th,td{ text-align:left; padding:16px 20px; border-bottom:1px solid var(--line); font-size:0.94rem; }
+  th{ background:var(--bg-2); font-weight:700; }
+  tr:last-child td{ border-bottom:none; }
+  td.yes{ color:var(--indigo); font-weight:600; }
+  @media (prefers-color-scheme: dark){ td.yes{ color:var(--lime); } }
+  :root[data-theme="dark"] td.yes{ color:var(--lime); }
+  td.no{ color:var(--ink-soft); }
+
+  /* Testimonials marquee */
+  .quotes{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .quote{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:26px; }
+  .quote p{ font-size:1rem; margin-bottom:16px; }
+  .quote cite{ font-style:normal; color:var(--ink-soft); font-size:0.88rem; }
+
+  /* Pricing */
+  .plans{ display:grid; grid-template-columns:repeat(2,1fr); gap:22px; max-width:760px; margin:0 auto; }
+  .plan{ border:1px solid var(--line); border-radius:14px; padding:34px; background:var(--card); }
+  .plan.pro{ border-color:var(--indigo); position:relative; }
+  .plan h3{ font-size:1.15rem; margin-bottom:8px; }
+  .plan .price{ font-family:'IBM Plex Mono',monospace; font-size:2.2rem; margin:14px 0; }
+  .plan .price small{ font-family:'Manrope',sans-serif; font-size:0.9rem; color:var(--ink-soft); }
+  .plan ul{ list-style:none; margin:20px 0 26px; }
+  .plan ul li{ padding:8px 0; font-size:0.92rem; color:var(--ink-soft); }
+  .plan-cta{ display:block; text-align:center; padding:13px; border-radius:8px; text-decoration:none; border:1px solid var(--ink); font-size:0.94rem; }
+  .plan.pro .plan-cta{ background:var(--indigo); color:#fff; border-color:var(--indigo); }
+
+  .final{ text-align:center; padding:110px 0; }
+  .final h2{ font-size:clamp(2rem,4.2vw,3rem); max-width:18ch; margin:0 auto 28px; }
+
+  footer{ border-top:1px solid var(--line); padding:36px 0; }
+  footer .wrap{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; color:var(--ink-soft); font-size:0.86rem; }
+
+  @media (max-width:900px){
+    .hero .wrap{ grid-template-columns:1fr; }
+    .feature-grid{ grid-template-columns:1fr; }
+    .quotes{ grid-template-columns:1fr; }
+    .plans{ grid-template-columns:1fr; }
+    .nav-links{ display:none; }
+    table{ font-size:0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">Ca<em>uce</em></div>
+    <div class="nav-links">
+      <a href="#producto">Producto</a>
+      <a href="#comparativa">Comparativa</a>
+      <a href="#precios">Precios</a>
+    </div>
+    <a class="nav-cta" href="#precios">Empezar gratis</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="kicker">Para freelancers e independientes</span>
+      <h1>Cotiza, factura y cobra sin abrir cinco pestañas distintas.</h1>
+      <p class="lead">Cauce junta tus propuestas, contratos y facturas en un solo lugar, y te avisa antes de que un pago se te escape.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#precios">Empezar gratis</a>
+        <a class="btn-ghost" href="#producto">Ver cómo funciona</a>
+      </div>
+      <div class="hero-note">Sin tarjeta de crédito · 14 días de prueba en el plan Pro</div>
+    </div>
+    <div class="dash" id="dash">
+      <div class="dash-top">
+        <div class="l">Resumen de octubre</div>
+        <div class="dots"><span></span><span></span><span></span></div>
+      </div>
+      <div class="dash-stat">
+        <div class="label">Facturado este mes</div>
+        <div class="val up mono" id="statBilled">S/ 0</div>
+      </div>
+      <div class="dash-stat">
+        <div class="label">Pendiente de cobro</div>
+        <div class="val mono" id="statPending">S/ 0</div>
+      </div>
+      <div class="dash-stat">
+        <div class="label">Clientes activos</div>
+        <div class="val mono" id="statClients">0</div>
+      </div>
+      <div class="dash-bar-wrap">
+        <div class="dash-bar-track"><div class="dash-bar-fill" id="barFill"></div></div>
+        <div class="dash-bar-label"><span>Meta del mes</span><span id="barPct">0%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="producto">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Todo lo administrativo, en un solo flujo</h2>
+      <p>Diseñado para quien factura solo, no para un equipo de contabilidad.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="icon"></div>
+        <h3>Propuestas que se aceptan con un clic</h3>
+        <p>Tu cliente firma y aprueba el alcance directamente desde el link, sin ida y vuelta de PDFs.</p>
+      </div>
+      <div class="feature">
+        <div class="icon"></div>
+        <h3>Facturas que se generan solas</h3>
+        <p>Al aprobar una propuesta, la factura ya está lista con los datos correctos.</p>
+      </div>
+      <div class="feature">
+        <div class="icon"></div>
+        <h3>Recordatorios antes de que sea tarde</h3>
+        <p>Cauce le escribe a tu cliente tres días antes del vencimiento, no tú.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="comparativa">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Por qué dejar la hoja de cálculo</h2>
+    </div>
+    <table>
+      <thead>
+        <tr><th></th><th>Hoja de cálculo</th><th>Cauce</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Recordatorios de pago automáticos</td><td class="no">No</td><td class="yes">Sí</td></tr>
+        <tr><td>Firma de propuestas en línea</td><td class="no">No</td><td class="yes">Sí</td></tr>
+        <tr><td>Historial por cliente</td><td class="no">Manual</td><td class="yes">Automático</td></tr>
+        <tr><td>Factura generada desde la propuesta</td><td class="no">No</td><td class="yes">Sí</td></tr>
+        <tr><td>Acceso desde el celular</td><td class="no">Limitado</td><td class="yes">Completo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Gente que ya dejó de perseguir pagos</h2>
+    </div>
+    <div class="quotes">
+      <div class="quote">
+        <p>Reduje el tiempo que paso en tareas administrativas a menos de una hora por semana.</p>
+        <cite>— Marco Injoque, diseñador freelance</cite>
+      </div>
+      <div class="quote">
+        <p>Los recordatorios automáticos me recuperaron como dos pagos que se me hubieran pasado.</p>
+        <cite>— Valeria Ninatanta, consultora de marketing</cite>
+      </div>
+      <div class="quote">
+        <p>Mis clientes valoran que puedan aprobar todo desde el celular en un minuto.</p>
+        <cite>— Josué Ramírez, desarrollador independiente</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="precios">
+  <div class="wrap">
+    <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto;">
+      <h2>Empieza gratis, escala cuando lo necesites</h2>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <h3>Independiente</h3>
+        <div class="price">S/ 0<small> / mes</small></div>
+        <ul>
+          <li>Hasta 3 clientes activos</li>
+          <li>5 facturas al mes</li>
+          <li>Propuestas ilimitadas</li>
+        </ul>
+        <a class="plan-cta" href="#">Empezar gratis</a>
+      </div>
+      <div class="plan pro">
+        <h3>Pro</h3>
+        <div class="price">S/ 45<small> / mes</small></div>
+        <ul>
+          <li>Clientes y facturas ilimitadas</li>
+          <li>Recordatorios automáticos</li>
+          <li>Reportes de ingresos</li>
+          <li>Soporte prioritario</li>
+        </ul>
+        <a class="plan-cta" href="#">Probar 14 días gratis</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Deja de cobrar por WhatsApp y hojas sueltas</h2>
+    <a class="btn-primary" href="#precios">Crear mi cuenta gratis</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Cauce — Gestión simple para independientes</div>
+    <div>Hecho para quienes facturan solos</div>
+  </div>
+</footer>
+
+<script>
+  // Animación de dashboard al entrar en viewport
+  function animateNumber(el, target, prefix, duration){
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min(1, (now-start)/duration);
+      const eased = 1 - Math.pow(1-p, 3);
+      const val = Math.round(target * eased);
+      el.textContent = prefix + val.toLocaleString('es-PE');
+      if(p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  const dash = document.getElementById('dash');
+  let animated = false;
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting && !animated){
+        animated = true;
+        animateNumber(document.getElementById('statBilled'), 8420, 'S/ ', 1200);
+        animateNumber(document.getElementById('statPending'), 1650, 'S/ ', 1200);
+        animateNumber(document.getElementById('statClients'), 7, '', 900);
+        document.getElementById('barFill').style.width = '72%';
+        document.getElementById('barPct').textContent = '72%';
+      }
+    });
+  }, {threshold:0.4});
+  observer.observe(dash);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hora Azul — Fotografía nocturna</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4f1; --bg-2:#ebe9e4; --ink:#0e1015; --ink-soft:#4a4d57;
+    --amber:#c4670f; --amber-2:#8f4a08; --line:rgba(14,16,21,0.14); --card:#fff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0b0c10; --bg-2:#111319; --ink:#eceef2; --ink-soft:#9aa0ad;
+      --amber:#f0a13c; --amber-2:#f7c07a; --line:rgba(236,238,242,0.14); --card:#111319;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0b0c10; --bg-2:#111319; --ink:#eceef2; --ink-soft:#9aa0ad;
+    --amber:#f0a13c; --amber-2:#f7c07a; --line:rgba(236,238,242,0.14); --card:#111319;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{ background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; overflow-x:hidden; }
+  h1,h2,h3,.display{ font-family:'Space Grotesk',sans-serif; letter-spacing:-0.02em; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:0 28px; }
+  a{ color:inherit; }
+
+  nav{ position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  nav .wrap{ height:72px; display:flex; align-items:center; justify-content:space-between; }
+  .brand{ font-weight:600; font-size:1.2rem; display:flex; align-items:center; gap:8px; }
+  .brand-dot{ width:9px; height:9px; border-radius:50%; background:var(--amber); }
+  .nav-links{ display:flex; gap:30px; font-size:0.92rem; color:var(--ink-soft); }
+  .nav-links a{ text-decoration:none; }
+  .nav-links a:hover{ color:var(--ink); }
+  .nav-cta{ background:var(--amber); color:#0b0c10; padding:10px 18px; border-radius:3px; text-decoration:none; font-size:0.88rem; font-weight:600; }
+
+  /* HERO with canvas light trails */
+  .hero{ position:relative; padding:100px 0 70px; overflow:hidden; }
+  .hero-canvas{ position:absolute; inset:0; z-index:0; opacity:0.55; }
+  .hero .wrap{ position:relative; z-index:1; }
+  .kicker{ color:var(--amber); font-size:0.95rem; margin-bottom:20px; }
+  .hero h1{ font-size:clamp(2.3rem,4.6vw,3.9rem); max-width:16ch; line-height:1.06; }
+  .hero p.lead{ margin-top:22px; color:var(--ink-soft); max-width:52ch; font-size:1.08rem; }
+  .hero-actions{ margin-top:32px; display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
+  .btn-primary{ background:var(--amber); color:#0b0c10; padding:15px 26px; border-radius:3px; text-decoration:none; font-weight:600; font-size:0.96rem; display:inline-block; transition:transform .2s; }
+  .btn-primary:hover{ transform:translateY(-2px); }
+  .btn-ghost{ text-decoration:underline; text-underline-offset:4px; color:var(--ink-soft); font-size:0.96rem; }
+  .hero-meta{ margin-top:56px; display:flex; gap:40px; flex-wrap:wrap; }
+  .hero-meta div{ }
+  .hero-meta .n{ font-family:'Space Grotesk',sans-serif; font-size:1.7rem; color:var(--amber); }
+  .hero-meta .l{ font-size:0.85rem; color:var(--ink-soft); margin-top:4px; }
+
+  .section{ padding:96px 0; border-top:1px solid var(--line); }
+  .section-head{ max-width:56ch; margin-bottom:50px; }
+  .section-head h2{ font-size:clamp(1.8rem,3vw,2.4rem); }
+  .section-head p{ margin-top:14px; color:var(--ink-soft); font-size:1.02rem; }
+
+  /* Learn grid */
+  .learn-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+  .learn-item{ background:var(--bg); padding:32px; }
+  .learn-item h3{ font-size:1.15rem; margin-bottom:10px; font-weight:600; }
+  .learn-item p{ color:var(--ink-soft); font-size:0.95rem; }
+
+  /* Curriculum accordion */
+  .accordion{ border-top:1px solid var(--line); }
+  .acc-item{ border-bottom:1px solid var(--line); }
+  .acc-head{ display:flex; justify-content:space-between; align-items:center; padding:24px 0; cursor:pointer; }
+  .acc-head .tag{ color:var(--amber); font-size:0.85rem; margin-right:14px; }
+  .acc-head h3{ font-size:1.15rem; font-weight:500; display:flex; align-items:baseline; }
+  .acc-icon{ font-size:1.3rem; color:var(--ink-soft); transition:transform .25s; }
+  .acc-item.open .acc-icon{ transform:rotate(45deg); }
+  .acc-body{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
+  .acc-item.open .acc-body{ max-height:200px; }
+  .acc-body p{ padding:0 0 26px; color:var(--ink-soft); max-width:60ch; font-size:0.96rem; }
+
+  /* Instructor */
+  .instructor{ display:grid; grid-template-columns:0.8fr 1.2fr; gap:50px; align-items:center; }
+  .inst-photo{ aspect-ratio:4/5; border-radius:4px; background:linear-gradient(160deg, #1c2230, #0b0c10 60%); position:relative; overflow:hidden; }
+  .inst-photo::after{ content:''; position:absolute; width:140%; height:140%; background:radial-gradient(circle, var(--amber-2) 0%, transparent 60%); opacity:0.35; top:-20%; left:-20%; }
+  .inst-body h3{ font-size:1.5rem; margin-bottom:6px; }
+  .inst-role{ color:var(--amber); font-size:0.92rem; margin-bottom:18px; }
+  .inst-body p{ color:var(--ink-soft); margin-bottom:14px; }
+
+  /* Pricing */
+  .price-card{ max-width:520px; margin:0 auto; border:1px solid var(--line); border-radius:6px; padding:44px; background:var(--card); text-align:center; }
+  .price-card .amt{ font-family:'Space Grotesk',sans-serif; font-size:3rem; margin:18px 0 4px; }
+  .price-card .amt small{ font-size:1rem; color:var(--ink-soft); font-family:'Inter',sans-serif; }
+  .price-card ul{ list-style:none; text-align:left; margin:26px 0; max-width:340px; margin-left:auto; margin-right:auto; }
+  .price-card ul li{ padding:9px 0; border-top:1px solid var(--line); color:var(--ink-soft); font-size:0.94rem; }
+  .price-card ul li:first-child{ border-top:none; }
+
+  /* Final CTA */
+  .final{ text-align:center; padding:110px 0; }
+  .final h2{ font-size:clamp(2.1rem,4.4vw,3.2rem); max-width:16ch; margin:0 auto 30px; }
+
+  footer{ border-top:1px solid var(--line); padding:36px 0; }
+  footer .wrap{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; color:var(--ink-soft); font-size:0.86rem; }
+
+  @media (max-width:840px){
+    .learn-grid{ grid-template-columns:1fr; }
+    .instructor{ grid-template-columns:1fr; }
+    .nav-links{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="brand-dot"></span>Hora Azul</div>
+    <div class="nav-links">
+      <a href="#aprende">Programa</a>
+      <a href="#instructor">Instructor</a>
+      <a href="#precio">Inversión</a>
+    </div>
+    <a class="nav-cta" href="#precio">Reservar cupo</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <canvas class="hero-canvas" id="trails"></canvas>
+  <div class="wrap">
+    <div class="kicker">Masterclass en vivo · 4 semanas</div>
+    <h1>Aprende a fotografiar la ciudad cuando se apagan las luces del día.</h1>
+    <p class="lead">Un curso práctico sobre exposición larga, luz artificial y postproducción nocturna, guiado por un fotógrafo que lleva doce años disparando después de medianoche.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#precio">Reservar mi cupo</a>
+      <a class="btn-ghost" href="#aprende">Ver el programa</a>
+    </div>
+    <div class="hero-meta">
+      <div><div class="n">4</div><div class="l">semanas en vivo</div></div>
+      <div><div class="n">18</div><div class="l">cupos por cohorte</div></div>
+      <div><div class="n">1:1</div><div class="l">revisión de portafolio</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="aprende">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Lo que vas a poder hacer al terminar</h2>
+      <p>No es teoría de manual. Cada semana sales a disparar y traes el resultado a revisión.</p>
+    </div>
+    <div class="learn-grid">
+      <div class="learn-item">
+        <h3>Dominar el trípode y el disparador remoto</h3>
+        <p>Exposiciones de 8 a 30 segundos sin un solo pixel de movimiento no deseado.</p>
+      </div>
+      <div class="learn-item">
+        <h3>Leer la luz artificial de la calle</h3>
+        <p>Sodio, LED y neón se comportan distinto en el sensor. Vas a saber compensar cada uno.</p>
+      </div>
+      <div class="learn-item">
+        <h3>Fotografiar el cielo y la ciudad en un mismo cuadro</h3>
+        <p>Técnicas de exposición combinada para que ni el cielo se queme ni la calle quede negra.</p>
+      </div>
+      <div class="learn-item">
+        <h3>Revelar sin perder el ambiente nocturno</h3>
+        <p>Un flujo de trabajo en Lightroom pensado para negros profundos, no para aclarar todo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Cuatro semanas, un tema por semana</h2>
+    </div>
+    <div class="accordion" id="accordion">
+      <div class="acc-item open">
+        <div class="acc-head">
+          <h3><span class="tag">Semana 1</span>Fundamentos de exposición larga</h3>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body"><p>Equipo mínimo necesario, control de vibración, y tu primera salida nocturna guiada por videollamada.</p></div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head">
+          <h3><span class="tag">Semana 2</span>Luz artificial y color</h3>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body"><p>Balance de blancos manual para mezclas de sodio y LED, y cómo aprovechar los reflejos húmedos del pavimento.</p></div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head">
+          <h3><span class="tag">Semana 3</span>Cielo, ciudad y horizonte</h3>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body"><p>Astrofotografía urbana básica y técnicas de doble exposición para conservar detalle en ambos extremos.</p></div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-head">
+          <h3><span class="tag">Semana 4</span>Revelado y portafolio</h3>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body"><p>Sesión final de retroalimentación 1:1 sobre tu propia serie fotográfica nocturna.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="instructor">
+  <div class="instructor wrap">
+    <div class="inst-photo"></div>
+    <div class="inst-body">
+      <h3>Diego Farfán</h3>
+      <div class="inst-role">Fotógrafo urbano, 12 años disparando de noche</div>
+      <p>Empezó fotografiando su propio barrio a las 2 a.m. porque era la única hora libre que tenía. Hoy su trabajo nocturno se ha expuesto en tres galerías independientes y enseña desde 2021.</p>
+      <p>Este curso nació de la pregunta que más le hacían sus alumnos: "¿por qué mis fotos de noche siempre salen granuladas o movidas?"</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="precio">
+  <div class="wrap">
+    <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto;">
+      <h2 style="margin:0 auto;">Una sola inversión, sin mensualidades</h2>
+    </div>
+    <div class="price-card">
+      <div style="color:var(--amber); font-size:0.9rem;">Cohorte de noviembre</div>
+      <div class="amt">S/ 480<small> pago único</small></div>
+      <ul>
+        <li>8 clases en vivo (2 por semana)</li>
+        <li>Grabaciones disponibles 6 meses</li>
+        <li>Revisión 1:1 de tu portafolio final</li>
+        <li>Grupo privado de retroalimentación</li>
+      </ul>
+      <a class="btn-primary" href="#" style="width:100%; text-align:center;">Reservar mi cupo</a>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>La ciudad de noche tiene otra cara. Aprende a mostrarla.</h2>
+    <a class="btn-primary" href="#precio">Empezar en la próxima cohorte</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Hora Azul — Masterclass de fotografía nocturna</div>
+    <div>Cohortes limitadas a 18 personas</div>
+  </div>
+</footer>
+
+<script>
+  // Acordeón
+  document.querySelectorAll('.acc-item').forEach(item=>{
+    item.querySelector('.acc-head').addEventListener('click', ()=>{
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.acc-item').forEach(i=>i.classList.remove('open'));
+      if(!isOpen) item.classList.add('open');
+    });
+  });
+
+  // Light trail canvas animation
+  const canvas = document.getElementById('trails');
+  const ctx = canvas.getContext('2d');
+  let w,h;
+  function resize(){
+    w = canvas.width = canvas.offsetWidth;
+    h = canvas.height = canvas.offsetHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const trails = Array.from({length: 5}, (_,i)=>({
+    y: (h/6)*(i+1) + (Math.random()*40-20),
+    x: Math.random()*w,
+    speed: 0.6 + Math.random()*1.2,
+    len: 120 + Math.random()*180,
+    hue: i%2===0 ? '196,103,15' : '240,161,60'
+  }));
+
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    trails.forEach(t=>{
+      const grad = ctx.createLinearGradient(t.x - t.len, t.y, t.x, t.y);
+      grad.addColorStop(0, `rgba(${t.hue},0)`);
+      grad.addColorStop(1, `rgba(${t.hue},0.5)`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(t.x - t.len, t.y);
+      ctx.lineTo(t.x, t.y);
+      ctx.stroke();
+      if(!prefersReduced){
+        t.x += t.speed;
+        if(t.x - t.len > w) t.x = -t.len;
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+</script>
+
+</body>
+</html>
